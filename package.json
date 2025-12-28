@@ -1,0 +1,26 @@
+{
+  "name": "discipline-rpg",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "share": "npx localtunnel --port 3000"
+  },
+  "dependencies": {
+    "next": "12.3.4",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "next-pwa": "^5.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "14.18.36",
+    "@types/react": "18.0.28",
+    "@types/react-dom": "18.0.11",
+    "eslint": "8.36.0",
+    "eslint-config-next": "12.3.4",
+    "typescript": "4.9.5"
+  }
+}
