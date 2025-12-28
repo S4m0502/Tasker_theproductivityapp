@@ -16,7 +16,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'Tasker' }) => {
             <header style={{
                 padding: '1.5rem 1rem',
                 display: 'flex',
-                justifyContent: 'center',
+                justifyContent: 'space-between',
                 alignItems: 'center',
                 background: 'var(--bg-primary)',
                 position: 'sticky',
@@ -35,6 +35,10 @@ const Layout: React.FC<LayoutProps> = ({ children, title = 'Tasker' }) => {
                         Tasker
                     </h1>
                 </div>
+                <nav style={{ display: 'flex', gap: '1rem' }}>
+                    <a href="/" style={{ textDecoration: 'none', color: 'var(--text-primary)', fontSize: '1.2rem' }}>🏠</a>
+                    <a href="/leaderboard" style={{ textDecoration: 'none', color: 'var(--text-primary)', fontSize: '1.2rem' }}>🏆</a>
+                </nav>
             </header>
 
             <main style={{ flex: 1, padding: '1.5rem 1rem', maxWidth: '600px', margin: '0 auto', width: '100%' }}>

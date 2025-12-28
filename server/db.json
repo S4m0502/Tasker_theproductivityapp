@@ -1,0 +1,20 @@
+{
+  "users": {
+    "local-user": {
+      "name": "Player 1",
+      "xp": 40,
+      "coins": 20,
+      "level": 1,
+      "inventory": [],
+      "lastSeen": "2025-12-28T18:29:13.826Z"
+    },
+    "undefined": {
+      "name": "Me",
+      "xp": 40,
+      "coins": 20,
+      "level": 1,
+      "inventory": [],
+      "lastSeen": "2025-12-28T18:43:00.287Z"
+    }
+  }
+}

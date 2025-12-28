@@ -1,15 +1,28 @@
 import type { NextPage } from 'next';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import RewardHUD from '../components/RewardHUD';
 import TaskCard from '../components/TaskCard';
 import TaskManager from '../components/TaskManager';
 import ScratchCardModal from '../components/ScratchCardModal';
+import LockedScreen from '../components/LockedScreen';
 import { useGame } from '../lib/store';
 
 const Home: NextPage = () => {
-    const { user, addTask, removeTask, completeTask, undoTask, redeemReward } = useGame();
+    const { user, addTask, removeTask, completeTask, undoTask, redeemReward, unlockApp } = useGame();
     const [activeRewardId, setActiveRewardId] = useState<string | null>(null);
+    const [showLockOverlay, setShowLockOverlay] = useState(false);
+
+    useEffect(() => {
+        if (user.isLocked) {
+            const timer = setTimeout(() => {
+                setShowLockOverlay(true);
+            }, 200); // 0.2s delay
+            return () => clearTimeout(timer);
+        } else {
+            setShowLockOverlay(false);
+        }
+    }, [user.isLocked]);
 
     // Check for unredeemed rewards
     const unredeemedReward = user.inventory.find(r => !r.isRedeemed);
@@ -64,6 +77,10 @@ const Home: NextPage = () => {
                         onRedeem={redeemReward}
                         onClose={() => setActiveRewardId(null)}
                     />
+                )}
+
+                {showLockOverlay && (
+                    <LockedScreen onUnlock={unlockApp} mood={user.mood || "Earn your keep."} />
                 )}
             </main>
         </Layout>

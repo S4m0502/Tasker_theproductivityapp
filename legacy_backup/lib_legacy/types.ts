@@ -14,6 +14,8 @@ export interface Reward {
     type: RewardType;
     label: string;
     isRedeemed: boolean;
+    validWindow?: string;
+    expiresAt?: string;
 }
 
 export interface UserState {
@@ -22,6 +24,9 @@ export interface UserState {
     xp: number;
     level: number;
     inventory: Reward[];
+    lastVisitDate: string;
+    isLocked: boolean;
+    mood?: string;
 }
 
 export const INITIAL_TASKS: Task[] = [
