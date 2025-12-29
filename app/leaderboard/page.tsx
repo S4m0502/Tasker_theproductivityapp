@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
@@ -42,8 +44,8 @@ export default function LeaderboardPage() {
                         <div
                             key={user.id}
                             className={`flex items-center p-4 rounded-2xl border transition-all ${index === 0
-                                    ? 'bg-yellow-500/10 border-yellow-500/30 shadow-[0_0_20px_rgba(234,179,8,0.15)]'
-                                    : 'bg-gray-800/80 border-gray-700'
+                                ? 'bg-yellow-500/10 border-yellow-500/30 shadow-[0_0_20px_rgba(234,179,8,0.15)]'
+                                : 'bg-gray-800/80 border-gray-700'
                                 }`}
                         >
                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black ${index === 0 ? 'bg-yellow-500/20 text-yellow-400 text-lg' : 'bg-gray-900/50 text-gray-500 text-sm'
