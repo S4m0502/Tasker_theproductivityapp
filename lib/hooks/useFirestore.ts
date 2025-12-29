@@ -153,10 +153,16 @@ export function useUserData(user: User | null) {
                 streak: increment(1),
                 completedAt: serverTimestamp()
             });
-            // Grant Rewards
+
+            // Calculate new XP and level
+            const newXP = stats.xp + 20;
+            const newLevel = Math.floor(newXP / 100) + 1;
+
+            // Grant Rewards and update level
             await updateDoc(userRef, {
-                'stats.xp': increment(20),
+                'stats.xp': newXP,
                 'stats.coins': increment(10),
+                'stats.level': newLevel,
                 lastActive: serverTimestamp()
             });
 
@@ -175,10 +181,16 @@ export function useUserData(user: User | null) {
                 streak: increment(-1),
                 completedAt: null
             });
-            // Remove Rewards
+
+            // Calculate new XP and level
+            const newXP = Math.max(0, stats.xp - 20);
+            const newLevel = Math.floor(newXP / 100) + 1;
+
+            // Remove Rewards and update level
             await updateDoc(userRef, {
-                'stats.xp': increment(-20),
-                'stats.coins': increment(-10)
+                'stats.xp': newXP,
+                'stats.coins': Math.max(0, stats.coins - 10),
+                'stats.level': newLevel
             });
 
             // Decrement completion for calendar

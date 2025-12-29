@@ -14,6 +14,7 @@ import FullCalendar from '../../components/FullCalendar';
 import BottomNav from '../../components/BottomNav';
 import AvatarCreator from '../../components/AvatarCreator';
 import AvatarDisplay from '../../components/AvatarDisplay';
+import LevelUpPopup from '../../components/LevelUpPopup';
 
 export default function Dashboard() {
     const { user, loading: authLoading, signOut } = useAuth();
@@ -34,6 +35,7 @@ export default function Dashboard() {
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [showAvatarCreator, setShowAvatarCreator] = useState(false);
     const [avatarConfig, setAvatarConfig] = useState<any>(null);
+    const [levelUpPopup, setLevelUpPopup] = useState<number | null>(null);
     const router = useRouter();
 
     // Check for avatar on mount
@@ -46,6 +48,17 @@ export default function Dashboard() {
             setShowAvatarCreator(true);
         }
     }, [user]);
+
+    // Track level changes and show popup once per level
+    useEffect(() => {
+        if (stats.level > 1) {
+            const shownLevels = JSON.parse(localStorage.getItem('shown_levels') || '[]');
+            if (!shownLevels.includes(stats.level)) {
+                setLevelUpPopup(stats.level);
+                localStorage.setItem('shown_levels', JSON.stringify([...shownLevels, stats.level]));
+            }
+        }
+    }, [stats.level]);
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -120,6 +133,13 @@ export default function Dashboard() {
                         setShowAvatarCreator(false);
                     }}
                     onSkip={() => setShowAvatarCreator(false)}
+                />
+            )}
+
+            {levelUpPopup && (
+                <LevelUpPopup
+                    level={levelUpPopup}
+                    onClose={() => setLevelUpPopup(null)}
                 />
             )}
 
