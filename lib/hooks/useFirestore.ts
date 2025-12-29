@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot, doc, setDoc, updateDoc, increment, serverTimestamp, orderBy, limit } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, setDoc, updateDoc, deleteDoc, increment, serverTimestamp, orderBy, limit } from 'firebase/firestore';
 import { db } from '../firebase';
 import { User } from 'firebase/auth';
 
@@ -8,6 +8,7 @@ export interface Task {
     title: string;
     isCompleted: boolean;
     streak: number;
+    isPinned?: boolean;
     completedAt: any; // Timestamp
 }
 
@@ -46,7 +47,11 @@ export function useUserData(user: User | null) {
         });
 
         // Listen to Tasks
-        const tasksQuery = query(collection(db, `users/${user.uid}/tasks`), orderBy('createdAt', 'desc'));
+        const tasksQuery = query(
+            collection(db, `users/${user.uid}/tasks`),
+            orderBy('isPinned', 'desc'),
+            orderBy('createdAt', 'desc')
+        );
         const unsubTasks = onSnapshot(tasksQuery, (snapshot) => {
             const loadedTasks = snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -69,7 +74,25 @@ export function useUserData(user: User | null) {
             title,
             isCompleted: false,
             streak: 0,
+            isPinned: false,
             createdAt: serverTimestamp()
+        });
+    };
+
+    const deleteTask = async (taskId: string) => {
+        if (!user) return;
+        await deleteDoc(doc(db, `users/${user.uid}/tasks`, taskId));
+    };
+
+    const updateTask = async (taskId: string, data: Partial<Task>) => {
+        if (!user) return;
+        await updateDoc(doc(db, `users/${user.uid}/tasks`, taskId), data);
+    };
+
+    const togglePin = async (task: Task) => {
+        if (!user) return;
+        await updateDoc(doc(db, `users/${user.uid}/tasks`, task.id), {
+            isPinned: !task.isPinned
         });
     };
 
@@ -91,6 +114,15 @@ export function useUserData(user: User | null) {
                 'stats.coins': increment(10),
                 lastActive: serverTimestamp()
             });
+
+            // Record completion for calendar
+            const today = new Date().toISOString().split('T')[0];
+            const completionRef = doc(db, `users/${user.uid}/completions`, today);
+            await setDoc(completionRef, {
+                count: increment(1),
+                date: serverTimestamp()
+            }, { merge: true });
+
         } else {
             // Undo Task
             await updateDoc(taskRef, {
@@ -103,8 +135,15 @@ export function useUserData(user: User | null) {
                 'stats.xp': increment(-20),
                 'stats.coins': increment(-10)
             });
+
+            // Decrement completion for calendar
+            const today = new Date().toISOString().split('T')[0];
+            const completionRef = doc(db, `users/${user.uid}/completions`, today);
+            await updateDoc(completionRef, {
+                count: increment(-1)
+            });
         }
     };
 
-    return { stats, tasks, loading, addTask, toggleTask };
+    return { stats, tasks, loading, addTask, toggleTask, deleteTask, updateTask, togglePin };
 }

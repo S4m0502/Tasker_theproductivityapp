@@ -5,12 +5,30 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../lib/hooks/useAuth';
 import { useUserData, Task } from '../../lib/hooks/useFirestore';
 import LockedOverlay from '../../components/LockedOverlay';
+import XPBar from '../../components/XPBar';
+import GoldCoin from '../../components/GoldCoin';
+import WeeklyStrip from '../../components/WeeklyStrip';
+import TaskCard from '../../components/TaskCard';
+import TaskActionPanel from '../../components/TaskActionPanel';
+import FullCalendar from '../../components/FullCalendar';
 
 export default function Dashboard() {
     const { user, loading: authLoading, signOut } = useAuth();
-    const { stats, tasks, loading: dataLoading, addTask, toggleTask } = useUserData(user);
+    const {
+        stats,
+        tasks,
+        loading: dataLoading,
+        addTask,
+        toggleTask,
+        deleteTask,
+        updateTask,
+        togglePin
+    } = useUserData(user);
+
     const [newTaskTitle, setNewTaskTitle] = useState('');
     const [isLocked, setIsLocked] = useState(false);
+    const [showCalendar, setShowCalendar] = useState(false);
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -20,7 +38,7 @@ export default function Dashboard() {
     }, [user, authLoading, router]);
 
     useEffect(() => {
-        if (stats.xp >= 0) { // Simple check to ensure stats loaded
+        if (stats.xp >= 0) {
             const today = new Date().toDateString();
             const unlockedDate = localStorage.getItem('unlocked_date');
             if (unlockedDate !== today) {
@@ -30,7 +48,11 @@ export default function Dashboard() {
     }, [stats]);
 
     if (authLoading || dataLoading) {
-        return <div className="min-h-screen flex items-center justify-center text-white">Loading...</div>;
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white font-mono tracking-widest text-xs uppercase animate-pulse">
+                Initializing Protocol...
+            </div>
+        );
     }
 
     if (!user) return null;
@@ -42,87 +64,122 @@ export default function Dashboard() {
         setNewTaskTitle('');
     };
 
-
     const handleUnlock = () => {
         setIsLocked(false);
         localStorage.setItem('unlocked_date', new Date().toDateString());
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white p-4 pb-20">
+        <div className="min-h-screen bg-gray-950 text-white pb-32">
             <LockedOverlay isLocked={isLocked} onUnlock={handleUnlock} />
 
-            {/* Header */}
-            <header className="flex justify-between items-center mb-6">
-                <div>
-                    <h1 className="text-xl font-bold">Welcome, {user.email?.split('@')[0]}</h1>
-                    <div className="text-sm text-gray-400">Level {stats.level}</div>
-                </div>
-                <button onClick={() => signOut()} className="text-sm text-red-400">Logout</button>
-            </header>
+            {showCalendar && (
+                <FullCalendar user={user} onClose={() => setShowCalendar(false)} />
+            )}
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-gray-800 p-4 rounded-xl border border-gray-700">
-                    <div className="text-gray-400 text-xs uppercase tracking-wider">XP</div>
-                    <div className="text-2xl font-bold text-blue-400">{stats.xp}</div>
-                </div>
-                <div className="bg-gray-800 p-4 rounded-xl border border-gray-700">
-                    <div className="text-gray-400 text-xs uppercase tracking-wider">Coins</div>
-                    <div className="text-2xl font-bold text-yellow-400">{stats.coins}</div>
-                </div>
-            </div>
+            {selectedTask && (
+                <TaskActionPanel
+                    task={selectedTask}
+                    onClose={() => setSelectedTask(null)}
+                    onDelete={deleteTask}
+                    onTogglePin={togglePin}
+                    onUpdate={updateTask}
+                />
+            )}
 
-            {/* Tasks */}
-            <div className="space-y-3 mb-24">
-                <h2 className="text-lg font-semibold mb-2">Today's Tasks</h2>
-                {tasks.map(task => (
-                    <div
-                        key={task.id}
-                        onClick={() => toggleTask(task)}
-                        className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${task.isCompleted
-                            ? 'bg-green-900/20 border-green-500/50 opacity-70'
-                            : 'bg-gray-800 border-gray-700 hover:border-gray-600'
-                            }`}
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${task.isCompleted ? 'bg-green-500 border-green-500' : 'border-gray-500'
-                                }`}>
-                                {task.isCompleted && <span className="text-black text-xs">✓</span>}
-                            </div>
-                            <span className={task.isCompleted ? 'line-through text-gray-500' : ''}>{task.title}</span>
+            <div className="max-w-md mx-auto px-6 pt-10">
+                {/* Modern Header */}
+                <header className="flex flex-col gap-6 mb-10">
+                    <div className="flex justify-between items-start">
+                        <div className="flex flex-col">
+                            <h1 className="text-3xl font-black tracking-tight leading-none mb-1">
+                                {user.email?.split('@')[0]}
+                            </h1>
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Operator State: ACTIVE</span>
                         </div>
-                        <div className="text-xs text-gray-500">
-                            🔥 {task.streak}
-                        </div>
+                        <button
+                            onClick={() => signOut()}
+                            className="bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                        >
+                            Abstain
+                        </button>
                     </div>
-                ))}
+
+                    <div className="flex flex-col gap-4 bg-gray-900/40 p-5 rounded-[2rem] border border-gray-800/40 backdrop-blur-md">
+                        <div className="flex justify-between items-center px-1">
+                            <span className="text-xs font-black uppercase text-gray-400">Progression</span>
+                            <GoldCoin amount={stats.coins} />
+                        </div>
+                        <XPBar xp={stats.xp} level={stats.level} />
+                    </div>
+                </header>
+
+                {/* Progress Strip */}
+                <div className="mb-10">
+                    <WeeklyStrip user={user} onExpand={() => setShowCalendar(true)} />
+                </div>
+
+                {/* Tasks List */}
+                <div className="space-y-4">
+                    <div className="flex justify-between items-end px-2">
+                        <h2 className="text-sm font-black uppercase tracking-widest text-gray-400">Objectives</h2>
+                        <span className="text-[10px] font-bold text-blue-500/60 uppercase">Hold to Edit</span>
+                    </div>
+
+                    <div className="space-y-3">
+                        {tasks.length === 0 ? (
+                            <div className="text-center py-10 bg-gray-900/20 border-2 border-dashed border-gray-800 rounded-[2rem]">
+                                <span className="text-gray-600 text-xs font-bold uppercase tracking-widest">No Active Missions</span>
+                            </div>
+                        ) : (
+                            tasks.map(task => (
+                                <TaskCard
+                                    key={task.id}
+                                    task={task}
+                                    onToggle={toggleTask}
+                                    onLongPress={setSelectedTask}
+                                />
+                            ))
+                        )}
+                    </div>
+                </div>
             </div>
 
-            {/* Add Task Input */}
-            <form onSubmit={handleAddTask} className="fixed bottom-20 left-4 right-4">
-                <div className="flex gap-2">
+            {/* Quick Add Bar */}
+            <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-gray-950 via-gray-950/90 to-transparent pt-10">
+                <form
+                    onSubmit={handleAddTask}
+                    className="max-w-md mx-auto flex gap-3 p-2 bg-gray-900/80 border border-gray-800 rounded-3xl backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                >
                     <input
                         type="text"
                         value={newTaskTitle}
                         onChange={(e) => setNewTaskTitle(e.target.value)}
-                        placeholder="Add a new task..."
-                        className="flex-1 p-4 bg-gray-800 rounded-xl border border-gray-700 focus:border-blue-500 outline-none shadow-lg"
+                        placeholder="Define next objective..."
+                        className="flex-1 bg-transparent px-4 py-3 text-sm focus:outline-none placeholder:text-gray-600 font-medium"
                     />
                     <button
                         type="submit"
-                        className="bg-blue-600 text-white p-4 rounded-xl font-bold shadow-lg"
+                        disabled={!newTaskTitle.trim()}
+                        className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:bg-gray-800 text-white w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-lg shadow-blue-900/20 active:scale-90"
                     >
-                        +
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
+                </form>
+
+                {/* Bottom Navigation Simulation */}
+                <div className="max-w-md mx-auto mt-4 px-10 flex justify-between items-center">
+                    <button className="text-[10px] font-black uppercase tracking-widest text-blue-500">Inventory</button>
+                    <button
+                        onClick={() => router.push('/leaderboard')}
+                        className="text-[10px] font-black uppercase tracking-widest text-gray-600 hover:text-gray-300 transition-colors"
+                    >
+                        Multiverse
                     </button>
                 </div>
-            </form>
-
-            {/* Bottom Nav */}
-            <nav className="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 p-4 flex justify-around">
-                <button className="text-blue-400 font-bold">Tasks</button>
-                <button onClick={() => router.push('/leaderboard')} className="text-gray-400 hover:text-white">Leaderboard</button>
-            </nav>
+            </div>
         </div>
     );
 }
