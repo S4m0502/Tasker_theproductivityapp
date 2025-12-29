@@ -10,6 +10,7 @@ export interface Task {
     streak: number;
     isPinned?: boolean;
     completedAt: any; // Timestamp
+    createdAt?: any; // Timestamp
 }
 
 export interface UserStats {
