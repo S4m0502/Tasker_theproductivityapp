@@ -11,6 +11,9 @@ import WeeklyStrip from '../../components/WeeklyStrip';
 import TaskCard from '../../components/TaskCard';
 import TaskActionPanel from '../../components/TaskActionPanel';
 import FullCalendar from '../../components/FullCalendar';
+import BottomNav from '../../components/BottomNav';
+import AvatarCreator from '../../components/AvatarCreator';
+import AvatarDisplay from '../../components/AvatarDisplay';
 
 export default function Dashboard() {
     const { user, loading: authLoading, signOut } = useAuth();
@@ -29,7 +32,20 @@ export default function Dashboard() {
     const [isLocked, setIsLocked] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+    const [showAvatarCreator, setShowAvatarCreator] = useState(false);
+    const [avatarConfig, setAvatarConfig] = useState<any>(null);
     const router = useRouter();
+
+    // Check for avatar on mount
+    useEffect(() => {
+        const savedAvatar = localStorage.getItem('user_avatar');
+        if (savedAvatar) {
+            setAvatarConfig(JSON.parse(savedAvatar));
+        } else if (user) {
+            // Show avatar creator on first load
+            setShowAvatarCreator(true);
+        }
+    }, [user]);
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -87,15 +103,36 @@ export default function Dashboard() {
                 />
             )}
 
+            {showAvatarCreator && (
+                <AvatarCreator
+                    onComplete={(config) => {
+                        setAvatarConfig(config);
+                        localStorage.setItem('user_avatar', JSON.stringify(config));
+                        setShowAvatarCreator(false);
+                    }}
+                    onSkip={() => setShowAvatarCreator(false)}
+                />
+            )}
+
             <div className="max-w-md mx-auto px-6 pt-10">
                 {/* Modern Header */}
                 <header className="flex flex-col gap-6 mb-10">
                     <div className="flex justify-between items-start">
-                        <div className="flex flex-col">
-                            <h1 className="text-3xl font-black tracking-tight leading-none mb-1">
-                                {user.email?.split('@')[0]}
-                            </h1>
-                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Operator State: ACTIVE</span>
+                        <div className="flex items-center gap-4">
+                            {avatarConfig && (
+                                <div
+                                    onClick={() => setShowAvatarCreator(true)}
+                                    className="cursor-pointer hover:scale-105 transition-transform active:scale-95 bg-gray-800/50 rounded-2xl p-2 border border-gray-700/50"
+                                >
+                                    <AvatarDisplay config={avatarConfig} size={50} />
+                                </div>
+                            )}
+                            <div className="flex flex-col">
+                                <h1 className="text-3xl font-black tracking-tight leading-none mb-1">
+                                    {user.email?.split('@')[0]}
+                                </h1>
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Operator State: ACTIVE</span>
+                            </div>
                         </div>
                         <button
                             onClick={() => signOut()}
@@ -169,16 +206,7 @@ export default function Dashboard() {
                     </button>
                 </form>
 
-                {/* Bottom Navigation Simulation */}
-                <div className="max-w-md mx-auto mt-4 px-10 flex justify-between items-center">
-                    <button className="text-[10px] font-black uppercase tracking-widest text-blue-500">Inventory</button>
-                    <button
-                        onClick={() => router.push('/leaderboard')}
-                        className="text-[10px] font-black uppercase tracking-widest text-gray-600 hover:text-gray-300 transition-colors"
-                    >
-                        Multiverse
-                    </button>
-                </div>
+                <BottomNav currentPage="dashboard" />
             </div>
         </div>
     );
