@@ -55,19 +55,19 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
         const avatar = createAvatar(avataaars, {
             seed: config.seed,
             backgroundColor: config.backgroundColor,
-            accessories: config.accessories,
+            accessories: config.accessories as any,
             accessoriesProbability: config.accessoriesProbability,
-            clothing: config.clothing,
-            clothingColor: config.clothingColor,
-            eyebrows: config.eyebrows,
-            eyes: config.eyes,
-            facialHair: config.facialHair,
+            clothing: config.clothing as any,
+            clothesColor: config.clothingColor as any,
+            eyebrows: config.eyebrows as any,
+            eyes: config.eyes as any,
+            facialHair: config.facialHair as any,
             facialHairProbability: config.facialHairProbability,
-            hairColor: config.hairColor,
-            mouth: config.mouth,
-            skin: config.skin,
-            top: config.top,
-        });
+            hairColor: config.hairColor as any,
+            mouth: config.mouth as any,
+            skin: config.skin as any,
+            top: config.top as any,
+        } as any);
         return avatar.toString();
     }, [config]);
 
@@ -145,8 +145,8 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
                                     key={style}
                                     onClick={() => setConfig({ ...config, top: [style] })}
                                     className={`px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${config.top?.[0] === style
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                                         }`}
                                 >
                                     {style.replace(/([A-Z])/g, ' $1').trim()}
@@ -179,8 +179,8 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
                                     key={item}
                                     onClick={() => setConfig({ ...config, clothing: [item] })}
                                     className={`px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${config.clothing?.[0] === item
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                                         }`}
                                 >
                                     {item.replace(/([A-Z])/g, ' $1').trim()}
@@ -211,8 +211,8 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
                             <button
                                 onClick={() => setConfig({ ...config, accessories: [], accessoriesProbability: 0 })}
                                 className={`px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${config.accessoriesProbability === 0
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                                     }`}
                             >
                                 None
@@ -222,8 +222,8 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
                                     key={item}
                                     onClick={() => setConfig({ ...config, accessories: [item], accessoriesProbability: 100 })}
                                     className={`px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${config.accessories?.[0] === item
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                                         }`}
                                 >
                                     {item}
