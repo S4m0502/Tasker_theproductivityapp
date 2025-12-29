@@ -21,6 +21,7 @@ export interface UserStats {
 
 export function useUserData(user: User | null) {
     const [stats, setStats] = useState<UserStats>({ xp: 0, coins: 0, level: 1 });
+    const [profile, setProfile] = useState<{ avatarConfig?: any, username?: string }>({});
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -36,7 +37,12 @@ export function useUserData(user: User | null) {
         const userRef = doc(db, 'users', user.uid);
         const unsubUser = onSnapshot(userRef, (doc) => {
             if (doc.exists()) {
-                setStats(doc.data().stats as UserStats);
+                const data = doc.data();
+                setStats(data.stats as UserStats);
+                setProfile({
+                    avatarConfig: data.avatarConfig,
+                    username: data.username
+                });
             } else {
                 // Initialize new user
                 setDoc(userRef, {
@@ -109,12 +115,16 @@ export function useUserData(user: User | null) {
         // Delete the task
         await deleteDoc(doc(db, `users/${user.uid}/tasks`, taskId));
 
-        // If task was completed, remove the rewards
+        // If task was completed, remove the rewards and update level
         if (taskToDelete?.isCompleted) {
             const userRef = doc(db, 'users', user.uid);
+            const newXP = Math.max(0, stats.xp - 20);
+            const newLevel = Math.floor(newXP / 100) + 1;
+
             await updateDoc(userRef, {
-                'stats.xp': increment(-20),
-                'stats.coins': increment(-10)
+                'stats.xp': newXP,
+                'stats.coins': Math.max(0, stats.coins - 10),
+                'stats.level': newLevel
             });
 
             // Also decrement the completion count for calendar
@@ -202,5 +212,15 @@ export function useUserData(user: User | null) {
         }
     };
 
-    return { stats, tasks, loading, addTask, toggleTask, deleteTask, updateTask, togglePin };
+    const updateProfile = async (avatarConfig: any, username: string) => {
+        if (!user) return;
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, {
+            avatarConfig,
+            username,
+            lastActive: serverTimestamp()
+        });
+    };
+
+    return { stats, profile, tasks, loading, addTask, toggleTask, deleteTask, updateTask, togglePin, updateProfile };
 }

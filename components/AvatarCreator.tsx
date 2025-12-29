@@ -120,18 +120,12 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
                 </button>
 
                 {/* Actions */}
-                <div className="flex gap-3">
-                    <button
-                        onClick={onSkip}
-                        className="flex-1 bg-gray-800 text-gray-400 p-4 rounded-2xl font-bold uppercase tracking-widest text-xs hover:bg-gray-700 transition-colors"
-                    >
-                        Skip
-                    </button>
+                <div className="flex gap-4">
                     <button
                         onClick={() => onComplete({ ...config as AvatarConfig, username: username.trim() || 'Operator' })}
-                        className="flex-1 bg-blue-600 text-white p-4 rounded-2xl font-bold uppercase tracking-widest text-xs hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/30"
+                        className="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/30"
                     >
-                        Confirm
+                        Confirm Selection
                     </button>
                 </div>
             </div>
