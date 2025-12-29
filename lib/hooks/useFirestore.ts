@@ -102,7 +102,31 @@ export function useUserData(user: User | null) {
 
     const deleteTask = async (taskId: string) => {
         if (!user) return;
+
+        // Get the task to check if it was completed
+        const taskToDelete = tasks.find(t => t.id === taskId);
+
+        // Delete the task
         await deleteDoc(doc(db, `users/${user.uid}/tasks`, taskId));
+
+        // If task was completed, remove the rewards
+        if (taskToDelete?.isCompleted) {
+            const userRef = doc(db, 'users', user.uid);
+            await updateDoc(userRef, {
+                'stats.xp': increment(-20),
+                'stats.coins': increment(-10)
+            });
+
+            // Also decrement the completion count for calendar
+            const completedDate = taskToDelete.completedAt?.toDate?.();
+            if (completedDate) {
+                const dateStr = completedDate.toISOString().split('T')[0];
+                const completionRef = doc(db, `users/${user.uid}/completions`, dateStr);
+                await updateDoc(completionRef, {
+                    count: increment(-1)
+                });
+            }
+        }
     };
 
     const updateTask = async (taskId: string, data: Partial<Task>) => {

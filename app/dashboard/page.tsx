@@ -143,12 +143,6 @@ export default function Dashboard() {
                                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Operator State: ACTIVE</span>
                             </div>
                         </div>
-                        <button
-                            onClick={() => signOut()}
-                            className="bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full hover:bg-red-500 hover:text-white transition-all shadow-sm"
-                        >
-                            Abstain
-                        </button>
                     </div>
 
                     <div className="flex flex-col gap-4 bg-gray-900/40 p-5 rounded-[2rem] border border-gray-800/40 backdrop-blur-md">
