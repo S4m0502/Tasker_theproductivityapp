@@ -22,24 +22,27 @@ export default function AvatarDisplay({ config, size = 40 }: AvatarDisplayProps)
 
             {/* Hair */}
             {config.hairStyle === 'short' && (
-                <path d="M 60 60 Q 100 30 140 60" fill={config.hairColor} />
+                <path d="M 50 70 Q 70 40 100 35 Q 130 40 150 70 L 140 75 Q 100 50 60 75 Z" fill={config.hairColor} />
             )}
             {config.hairStyle === 'long' && (
                 <>
-                    <path d="M 60 60 Q 100 30 140 60" fill={config.hairColor} />
-                    <rect x="55" y="60" width="90" height="40" fill={config.hairColor} rx="10" />
+                    <ellipse cx="100" cy="50" rx="55" ry="35" fill={config.hairColor} />
+                    <rect x="50" y="65" width="100" height="50" fill={config.hairColor} rx="15" />
                 </>
             )}
             {config.hairStyle === 'curly' && (
                 <>
-                    <circle cx="70" cy="50" r="15" fill={config.hairColor} />
-                    <circle cx="100" cy="40" r="15" fill={config.hairColor} />
-                    <circle cx="130" cy="50" r="15" fill={config.hairColor} />
+                    <circle cx="65" cy="45" r="18" fill={config.hairColor} />
+                    <circle cx="100" cy="35" r="20" fill={config.hairColor} />
+                    <circle cx="135" cy="45" r="18" fill={config.hairColor} />
+                    <circle cx="80" cy="50" r="15" fill={config.hairColor} />
+                    <circle cx="120" cy="50" r="15" fill={config.hairColor} />
                 </>
             )}
             {config.hairStyle === 'mohawk' && (
-                <rect x="95" y="20" width="10" height="40" fill={config.hairColor} />
+                <path d="M 95 25 L 90 50 L 95 60 L 105 60 L 110 50 L 105 25 Z" fill={config.hairColor} />
             )}
+            {config.hairStyle === 'bald' && null}
 
             {/* Eyes */}
             {config.eyeType === 'normal' && (

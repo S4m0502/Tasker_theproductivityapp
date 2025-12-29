@@ -9,6 +9,7 @@ interface AvatarConfig {
     eyeType: string;
     mouthType: string;
     clothingColor: string;
+    username?: string;
 }
 
 interface AvatarCreatorProps {
@@ -31,7 +32,9 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
         eyeType: EYE_TYPES[0],
         mouthType: MOUTH_TYPES[0],
         clothingColor: CLOTHING_COLORS[0],
+        username: '',
     });
+    const [username, setUsername] = useState('');
 
     const renderAvatar = () => {
         return (
@@ -41,24 +44,27 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
 
                 {/* Hair */}
                 {config.hairStyle === 'short' && (
-                    <path d="M 60 60 Q 100 30 140 60" fill={config.hairColor} />
+                    <path d="M 50 70 Q 70 40 100 35 Q 130 40 150 70 L 140 75 Q 100 50 60 75 Z" fill={config.hairColor} />
                 )}
                 {config.hairStyle === 'long' && (
                     <>
-                        <path d="M 60 60 Q 100 30 140 60" fill={config.hairColor} />
-                        <rect x="55" y="60" width="90" height="40" fill={config.hairColor} rx="10" />
+                        <ellipse cx="100" cy="50" rx="55" ry="35" fill={config.hairColor} />
+                        <rect x="50" y="65" width="100" height="50" fill={config.hairColor} rx="15" />
                     </>
                 )}
                 {config.hairStyle === 'curly' && (
                     <>
-                        <circle cx="70" cy="50" r="15" fill={config.hairColor} />
-                        <circle cx="100" cy="40" r="15" fill={config.hairColor} />
-                        <circle cx="130" cy="50" r="15" fill={config.hairColor} />
+                        <circle cx="65" cy="45" r="18" fill={config.hairColor} />
+                        <circle cx="100" cy="35" r="20" fill={config.hairColor} />
+                        <circle cx="135" cy="45" r="18" fill={config.hairColor} />
+                        <circle cx="80" cy="50" r="15" fill={config.hairColor} />
+                        <circle cx="120" cy="50" r="15" fill={config.hairColor} />
                     </>
                 )}
                 {config.hairStyle === 'mohawk' && (
-                    <rect x="95" y="20" width="10" height="40" fill={config.hairColor} />
+                    <path d="M 95 25 L 90 50 L 95 60 L 105 60 L 110 50 L 105 25 Z" fill={config.hairColor} />
                 )}
+                {config.hairStyle === 'bald' && null}
 
                 {/* Eyes */}
                 {config.eyeType === 'normal' && (
@@ -119,7 +125,17 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
         <div className="fixed inset-0 z-[200] bg-gray-950 flex flex-col items-center p-6 animate-in fade-in duration-500 overflow-y-auto">
             <div className="max-w-md w-full my-8">
                 <h1 className="text-3xl font-black text-center mb-2">Create Your Avatar</h1>
-                <p className="text-xs text-gray-500 uppercase tracking-widest text-center mb-8">Operator Identification</p>
+                <p className="text-xs text-gray-500 uppercase tracking-widest text-center mb-4">Operator Identification</p>
+
+                {/* Username Input */}
+                <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter your name..."
+                    className="w-full bg-gray-800 border border-gray-700 rounded-2xl p-3 text-center text-sm focus:border-blue-500 outline-none mb-6"
+                    maxLength={20}
+                />
 
                 {/* Avatar Preview */}
                 <div className="bg-gray-900/50 border border-gray-800 rounded-3xl p-8 mb-8">
@@ -240,7 +256,7 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
                         Skip
                     </button>
                     <button
-                        onClick={() => onComplete(config)}
+                        onClick={() => onComplete({ ...config, username: username.trim() || 'Operator' })}
                         className="flex-1 bg-blue-600 text-white p-4 rounded-2xl font-bold uppercase tracking-widest text-xs hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/30"
                     >
                         Confirm

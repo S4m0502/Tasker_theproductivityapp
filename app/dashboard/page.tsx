@@ -86,7 +86,7 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-950 text-white pb-32">
+        <div className="min-h-screen bg-gray-950 text-white pb-24">
             <LockedOverlay isLocked={isLocked} onUnlock={handleUnlock} />
 
             {showCalendar && (
@@ -128,8 +128,8 @@ export default function Dashboard() {
                                 </div>
                             )}
                             <div className="flex flex-col">
-                                <h1 className="text-3xl font-black tracking-tight leading-none mb-1">
-                                    {user.email?.split('@')[0]}
+                                <h1 className="text-xl font-black tracking-tight leading-none mb-1">
+                                    {avatarConfig?.username || user.email?.split('@')[0]}
                                 </h1>
                                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Operator State: ACTIVE</span>
                             </div>
@@ -159,7 +159,7 @@ export default function Dashboard() {
                 {/* Tasks List */}
                 <div className="space-y-4">
                     <div className="flex justify-between items-end px-2">
-                        <h2 className="text-sm font-black uppercase tracking-widest text-gray-400">Objectives</h2>
+                        <h2 className="text-sm font-black uppercase tracking-widest text-gray-400">Tasks</h2>
                         <span className="text-[10px] font-bold text-blue-500/60 uppercase">Hold to Edit</span>
                     </div>
 
