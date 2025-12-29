@@ -48,15 +48,25 @@ export function useUserData(user: User | null) {
 
         // Listen to Tasks
         const tasksQuery = query(
-            collection(db, `users/${user.uid}/tasks`),
-            orderBy('isPinned', 'desc'),
-            orderBy('createdAt', 'desc')
+            collection(db, `users/${user.uid}/tasks`)
         );
         const unsubTasks = onSnapshot(tasksQuery, (snapshot) => {
             const loadedTasks = snapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             })) as Task[];
+
+            // Sort client-side: pinned first, then by creation date
+            loadedTasks.sort((a, b) => {
+                if (a.isPinned && !b.isPinned) return -1;
+                if (!a.isPinned && b.isPinned) return 1;
+                // For createdAt, handle serverTimestamp which might be null initially
+                const aTime = a.createdAt?.toMillis?.() || 0;
+                const bTime = b.createdAt?.toMillis?.() || 0;
+                return bTime - aTime; // Descending order
+            });
+
+            console.log('Tasks loaded:', loadedTasks.length);
             setTasks(loadedTasks);
             setLoading(false);
         });
@@ -68,15 +78,25 @@ export function useUserData(user: User | null) {
     }, [user]);
 
     const addTask = async (title: string) => {
-        if (!user) return;
-        const newTaskRef = doc(collection(db, `users/${user.uid}/tasks`));
-        await setDoc(newTaskRef, {
-            title,
-            isCompleted: false,
-            streak: 0,
-            isPinned: false,
-            createdAt: serverTimestamp()
-        });
+        if (!user) {
+            console.error('No user found when trying to add task');
+            return;
+        }
+        console.log('Adding task to Firestore for user:', user.uid);
+        try {
+            const newTaskRef = doc(collection(db, `users/${user.uid}/tasks`));
+            await setDoc(newTaskRef, {
+                title,
+                isCompleted: false,
+                streak: 0,
+                isPinned: false,
+                createdAt: serverTimestamp()
+            });
+            console.log('Task added to Firestore successfully');
+        } catch (error) {
+            console.error('Firestore error adding task:', error);
+            throw error;
+        }
     };
 
     const deleteTask = async (taskId: string) => {

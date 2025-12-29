@@ -75,9 +75,18 @@ export default function Dashboard() {
 
     const handleAddTask = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newTaskTitle.trim()) return;
-        await addTask(newTaskTitle);
-        setNewTaskTitle('');
+        console.log('Adding task:', newTaskTitle);
+        if (!newTaskTitle.trim()) {
+            console.log('Task title is empty');
+            return;
+        }
+        try {
+            await addTask(newTaskTitle);
+            console.log('Task added successfully');
+            setNewTaskTitle('');
+        } catch (error) {
+            console.error('Error adding task:', error);
+        }
     };
 
     const handleUnlock = () => {
