@@ -1,15 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { createAvatar } from '@dicebear/core';
+import { avataaars } from '@dicebear/collection';
 
 interface AvatarConfig {
-    skinTone: string;
-    hairStyle: string;
-    hairColor: string;
-    eyeType: string;
-    mouthType: string;
-    clothingColor: string;
     username?: string;
+    seed: string;
+    backgroundColor: string[];
+    accessories: string[];
+    accessoriesProbability: number;
+    clothing: string[];
+    clothingColor: string[];
+    eyebrows: string[];
+    eyes: string[];
+    facialHair: string[];
+    facialHairProbability: number;
+    hairColor: string[];
+    mouth: string[];
+    skin: string[];
+    top: string[];
 }
 
 interface AvatarCreatorProps {
@@ -17,108 +27,64 @@ interface AvatarCreatorProps {
     onSkip: () => void;
 }
 
-const SKIN_TONES = ['#F9C9B6', '#E0AC69', '#C68642', '#8D5524', '#613D24'];
-const HAIR_STYLES = ['short', 'long', 'curly', 'bald', 'mohawk'];
-const HAIR_COLORS = ['#2C1B18', '#B55239', '#E8E1E1', '#F59797', '#6A4E42'];
-const EYE_TYPES = ['normal', 'happy', 'wink', 'closed', 'surprised'];
-const MOUTH_TYPES = ['smile', 'serious', 'smirk', 'laugh', 'neutral'];
-const CLOTHING_COLORS = ['#3B82F6', '#EF4444', '#10B981', '#8B5CF6', '#F59E0B'];
+const SKIN_COLORS = ['ffdbb4', 'edb98a', 'd08b5b', 'ae5d29', '614335'];
+const HAIR_COLORS = ['2c1b18', '4a312c', '724133', 'a55728', 'b58143', 'c93305', 'd6b370', 'e16381'];
+const CLOTHING_COLORS = ['3c4f5c', '5199e4', '25557c', 'e6e6e6', '929598', 'a7ffc4', 'ffdeb5', 'ffafb9', 'ffffb1'];
+const HAIR_STYLES = ['bigHair', 'bob', 'bun', 'curly', 'curvy', 'dreads', 'frida', 'fro', 'froAndBand', 'longButNotTooLong', 'miaWallace', 'shaggy', 'shaggyMullet', 'shavedSides', 'straight01', 'straight02', 'straightAndStrand'];
+const FACIAL_HAIR = ['beardLight', 'beardMajestic', 'beardMedium', 'moustacheFancy', 'moustacheMagnum'];
+const ACCESSORIES = ['kurt', 'prescription01', 'prescription02', 'round', 'sunglasses', 'wayfarers'];
+const CLOTHING = ['blazerAndShirt', 'blazerAndSweater', 'collarAndSweater', 'graphicShirt', 'hoodie', 'overall', 'shirtCrewNeck', 'shirtScoopNeck', 'shirtVNeck'];
 
 export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps) {
-    const [config, setConfig] = useState<AvatarConfig>({
-        skinTone: SKIN_TONES[0],
-        hairStyle: HAIR_STYLES[0],
-        hairColor: HAIR_COLORS[0],
-        eyeType: EYE_TYPES[0],
-        mouthType: MOUTH_TYPES[0],
-        clothingColor: CLOTHING_COLORS[0],
-        username: '',
-    });
     const [username, setUsername] = useState('');
+    const [config, setConfig] = useState<Partial<AvatarConfig>>({
+        seed: Math.random().toString(36).substring(7),
+        backgroundColor: ['65c9ff'],
+        skin: [SKIN_COLORS[0]],
+        hairColor: [HAIR_COLORS[0]],
+        clothingColor: [CLOTHING_COLORS[0]],
+        top: [HAIR_STYLES[0]],
+        clothing: [CLOTHING[0]],
+        accessories: [],
+        accessoriesProbability: 0,
+        facialHair: [],
+        facialHairProbability: 0,
+    });
 
-    const renderAvatar = () => {
-        return (
-            <svg width="200" height="200" viewBox="0 0 200 200" className="mx-auto">
-                {/* Head */}
-                <circle cx="100" cy="80" r="50" fill={config.skinTone} />
+    const avatarSvg = useMemo(() => {
+        const avatar = createAvatar(avataaars, {
+            seed: config.seed,
+            backgroundColor: config.backgroundColor,
+            accessories: config.accessories,
+            accessoriesProbability: config.accessoriesProbability,
+            clothing: config.clothing,
+            clothingColor: config.clothingColor,
+            eyebrows: config.eyebrows,
+            eyes: config.eyes,
+            facialHair: config.facialHair,
+            facialHairProbability: config.facialHairProbability,
+            hairColor: config.hairColor,
+            mouth: config.mouth,
+            skin: config.skin,
+            top: config.top,
+        });
+        return avatar.toString();
+    }, [config]);
 
-                {/* Hair */}
-                {config.hairStyle === 'short' && (
-                    <path d="M 50 70 Q 70 40 100 35 Q 130 40 150 70 L 140 75 Q 100 50 60 75 Z" fill={config.hairColor} />
-                )}
-                {config.hairStyle === 'long' && (
-                    <>
-                        <ellipse cx="100" cy="50" rx="55" ry="35" fill={config.hairColor} />
-                        <rect x="50" y="65" width="100" height="50" fill={config.hairColor} rx="15" />
-                    </>
-                )}
-                {config.hairStyle === 'curly' && (
-                    <>
-                        <circle cx="65" cy="45" r="18" fill={config.hairColor} />
-                        <circle cx="100" cy="35" r="20" fill={config.hairColor} />
-                        <circle cx="135" cy="45" r="18" fill={config.hairColor} />
-                        <circle cx="80" cy="50" r="15" fill={config.hairColor} />
-                        <circle cx="120" cy="50" r="15" fill={config.hairColor} />
-                    </>
-                )}
-                {config.hairStyle === 'mohawk' && (
-                    <path d="M 95 25 L 90 50 L 95 60 L 105 60 L 110 50 L 105 25 Z" fill={config.hairColor} />
-                )}
-                {config.hairStyle === 'bald' && null}
-
-                {/* Eyes */}
-                {config.eyeType === 'normal' && (
-                    <>
-                        <circle cx="85" cy="75" r="5" fill="#000" />
-                        <circle cx="115" cy="75" r="5" fill="#000" />
-                    </>
-                )}
-                {config.eyeType === 'happy' && (
-                    <>
-                        <path d="M 80 75 Q 85 70 90 75" stroke="#000" strokeWidth="2" fill="none" />
-                        <path d="M 110 75 Q 115 70 120 75" stroke="#000" strokeWidth="2" fill="none" />
-                    </>
-                )}
-                {config.eyeType === 'wink' && (
-                    <>
-                        <circle cx="85" cy="75" r="5" fill="#000" />
-                        <line x1="110" y1="75" x2="120" y2="75" stroke="#000" strokeWidth="2" />
-                    </>
-                )}
-                {config.eyeType === 'closed' && (
-                    <>
-                        <line x1="80" y1="75" x2="90" y2="75" stroke="#000" strokeWidth="2" />
-                        <line x1="110" y1="75" x2="120" y2="75" stroke="#000" strokeWidth="2" />
-                    </>
-                )}
-                {config.eyeType === 'surprised' && (
-                    <>
-                        <circle cx="85" cy="75" r="7" fill="#000" />
-                        <circle cx="115" cy="75" r="7" fill="#000" />
-                    </>
-                )}
-
-                {/* Mouth */}
-                {config.mouthType === 'smile' && (
-                    <path d="M 80 95 Q 100 105 120 95" stroke="#000" strokeWidth="2" fill="none" />
-                )}
-                {config.mouthType === 'serious' && (
-                    <line x1="85" y1="100" x2="115" y2="100" stroke="#000" strokeWidth="2" />
-                )}
-                {config.mouthType === 'smirk' && (
-                    <path d="M 80 100 Q 95 105 110 100" stroke="#000" strokeWidth="2" fill="none" />
-                )}
-                {config.mouthType === 'laugh' && (
-                    <path d="M 75 95 Q 100 110 125 95" stroke="#000" strokeWidth="3" fill="none" />
-                )}
-                {config.mouthType === 'neutral' && (
-                    <ellipse cx="100" cy="100" rx="8" ry="5" fill="#000" />
-                )}
-
-                {/* Body */}
-                <rect x="70" y="130" width="60" height="50" fill={config.clothingColor} rx="10" />
-            </svg>
-        );
+    const randomize = () => {
+        setConfig({
+            seed: Math.random().toString(36).substring(7),
+            backgroundColor: ['65c9ff'],
+            skin: [SKIN_COLORS[Math.floor(Math.random() * SKIN_COLORS.length)]],
+            hairColor: [HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)]],
+            clothingColor: [CLOTHING_COLORS[Math.floor(Math.random() * CLOTHING_COLORS.length)]],
+            top: [HAIR_STYLES[Math.floor(Math.random() * HAIR_STYLES.length)]],
+            clothing: [CLOTHING[Math.floor(Math.random() * CLOTHING.length)]],
+            accessories: Math.random() > 0.5 ? [ACCESSORIES[Math.floor(Math.random() * ACCESSORIES.length)]] : [],
+            accessoriesProbability: Math.random() > 0.5 ? 100 : 0,
+            facialHair: Math.random() > 0.7 ? [FACIAL_HAIR[Math.floor(Math.random() * FACIAL_HAIR.length)]] : [],
+            facialHairProbability: Math.random() > 0.7 ? 100 : 0,
+        });
     };
 
     return (
@@ -138,22 +104,33 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
                 />
 
                 {/* Avatar Preview */}
-                <div className="bg-gray-900/50 border border-gray-800 rounded-3xl p-8 mb-8">
-                    {renderAvatar()}
+                <div className="bg-gray-900/50 border border-gray-800 rounded-3xl p-8 mb-6">
+                    <div
+                        className="w-48 h-48 mx-auto"
+                        dangerouslySetInnerHTML={{ __html: avatarSvg }}
+                    />
                 </div>
+
+                {/* Randomize Button */}
+                <button
+                    onClick={randomize}
+                    className="w-full bg-purple-600 hover:bg-purple-500 text-white p-3 rounded-2xl font-bold uppercase tracking-widest text-xs mb-6 transition-colors"
+                >
+                    🎲 Randomize
+                </button>
 
                 {/* Customization Options */}
                 <div className="space-y-6 mb-8">
                     {/* Skin Tone */}
                     <div>
                         <label className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Skin Tone</label>
-                        <div className="flex gap-2">
-                            {SKIN_TONES.map(tone => (
+                        <div className="flex gap-2 flex-wrap">
+                            {SKIN_COLORS.map(color => (
                                 <button
-                                    key={tone}
-                                    onClick={() => setConfig({ ...config, skinTone: tone })}
-                                    className={`w-10 h-10 rounded-full border-2 transition-all ${config.skinTone === tone ? 'border-blue-500 scale-110' : 'border-gray-700'}`}
-                                    style={{ backgroundColor: tone }}
+                                    key={color}
+                                    onClick={() => setConfig({ ...config, skin: [color] })}
+                                    className={`w-10 h-10 rounded-full border-2 transition-all ${config.skin?.[0] === color ? 'border-blue-500 scale-110' : 'border-gray-700'}`}
+                                    style={{ backgroundColor: `#${color}` }}
                                 />
                             ))}
                         </div>
@@ -162,17 +139,17 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
                     {/* Hair Style */}
                     <div>
                         <label className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Hair Style</label>
-                        <div className="flex gap-2 flex-wrap">
-                            {HAIR_STYLES.map(style => (
+                        <div className="grid grid-cols-3 gap-2">
+                            {HAIR_STYLES.slice(0, 9).map(style => (
                                 <button
                                     key={style}
-                                    onClick={() => setConfig({ ...config, hairStyle: style })}
-                                    className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${config.hairStyle === style
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                    onClick={() => setConfig({ ...config, top: [style] })}
+                                    className={`px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${config.top?.[0] === style
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                                         }`}
                                 >
-                                    {style}
+                                    {style.replace(/([A-Z])/g, ' $1').trim()}
                                 </button>
                             ))}
                         </div>
@@ -181,52 +158,14 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
                     {/* Hair Color */}
                     <div>
                         <label className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Hair Color</label>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                             {HAIR_COLORS.map(color => (
                                 <button
                                     key={color}
-                                    onClick={() => setConfig({ ...config, hairColor: color })}
-                                    className={`w-10 h-10 rounded-full border-2 transition-all ${config.hairColor === color ? 'border-blue-500 scale-110' : 'border-gray-700'}`}
-                                    style={{ backgroundColor: color }}
+                                    onClick={() => setConfig({ ...config, hairColor: [color] })}
+                                    className={`w-10 h-10 rounded-full border-2 transition-all ${config.hairColor?.[0] === color ? 'border-blue-500 scale-110' : 'border-gray-700'}`}
+                                    style={{ backgroundColor: `#${color}` }}
                                 />
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Eyes */}
-                    <div>
-                        <label className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Eyes</label>
-                        <div className="flex gap-2 flex-wrap">
-                            {EYE_TYPES.map(type => (
-                                <button
-                                    key={type}
-                                    onClick={() => setConfig({ ...config, eyeType: type })}
-                                    className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${config.eyeType === type
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                        }`}
-                                >
-                                    {type}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Mouth */}
-                    <div>
-                        <label className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Mouth</label>
-                        <div className="flex gap-2 flex-wrap">
-                            {MOUTH_TYPES.map(type => (
-                                <button
-                                    key={type}
-                                    onClick={() => setConfig({ ...config, mouthType: type })}
-                                    className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${config.mouthType === type
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                        }`}
-                                >
-                                    {type}
-                                </button>
                             ))}
                         </div>
                     </div>
@@ -234,14 +173,61 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
                     {/* Clothing */}
                     <div>
                         <label className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Outfit</label>
-                        <div className="flex gap-2">
+                        <div className="grid grid-cols-3 gap-2">
+                            {CLOTHING.slice(0, 6).map(item => (
+                                <button
+                                    key={item}
+                                    onClick={() => setConfig({ ...config, clothing: [item] })}
+                                    className={`px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${config.clothing?.[0] === item
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                        }`}
+                                >
+                                    {item.replace(/([A-Z])/g, ' $1').trim()}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Clothing Color */}
+                    <div>
+                        <label className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Outfit Color</label>
+                        <div className="flex gap-2 flex-wrap">
                             {CLOTHING_COLORS.map(color => (
                                 <button
                                     key={color}
-                                    onClick={() => setConfig({ ...config, clothingColor: color })}
-                                    className={`w-10 h-10 rounded-full border-2 transition-all ${config.clothingColor === color ? 'border-blue-500 scale-110' : 'border-gray-700'}`}
-                                    style={{ backgroundColor: color }}
+                                    onClick={() => setConfig({ ...config, clothingColor: [color] })}
+                                    className={`w-10 h-10 rounded-full border-2 transition-all ${config.clothingColor?.[0] === color ? 'border-blue-500 scale-110' : 'border-gray-700'}`}
+                                    style={{ backgroundColor: `#${color}` }}
                                 />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Accessories */}
+                    <div>
+                        <label className="text-[10px] uppercase font-bold text-gray-500 tracking-widest mb-2 block">Accessories</label>
+                        <div className="grid grid-cols-3 gap-2">
+                            <button
+                                onClick={() => setConfig({ ...config, accessories: [], accessoriesProbability: 0 })}
+                                className={`px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${config.accessoriesProbability === 0
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                    }`}
+                            >
+                                None
+                            </button>
+                            {ACCESSORIES.slice(0, 5).map(item => (
+                                <button
+                                    key={item}
+                                    onClick={() => setConfig({ ...config, accessories: [item], accessoriesProbability: 100 })}
+                                    className={`px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${config.accessories?.[0] === item
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                        }`}
+                                >
+                                    {item}
+                                </button>
                             ))}
                         </div>
                     </div>
@@ -256,7 +242,7 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
                         Skip
                     </button>
                     <button
-                        onClick={() => onComplete({ ...config, username: username.trim() || 'Operator' })}
+                        onClick={() => onComplete({ ...config as AvatarConfig, username: username.trim() || 'Operator' })}
                         className="flex-1 bg-blue-600 text-white p-4 rounded-2xl font-bold uppercase tracking-widest text-xs hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/30"
                     >
                         Confirm

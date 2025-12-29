@@ -166,7 +166,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Tasks List */}
-                <div className="space-y-4">
+                <div className="space-y-4 mb-40">
                     <div className="flex justify-between items-end px-2">
                         <h2 className="text-sm font-black uppercase tracking-widest text-gray-400">Tasks</h2>
                         <span className="text-[10px] font-bold text-blue-500/60 uppercase">Hold to Edit</span>
