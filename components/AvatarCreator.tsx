@@ -116,8 +116,8 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
     };
 
     return (
-        <div className="fixed inset-0 z-[200] bg-gray-950 flex flex-col items-center justify-center p-6 animate-in fade-in duration-500">
-            <div className="max-w-md w-full">
+        <div className="fixed inset-0 z-[200] bg-gray-950 flex flex-col items-center p-6 animate-in fade-in duration-500 overflow-y-auto">
+            <div className="max-w-md w-full my-8">
                 <h1 className="text-3xl font-black text-center mb-2">Create Your Avatar</h1>
                 <p className="text-xs text-gray-500 uppercase tracking-widest text-center mb-8">Operator Identification</p>
 
@@ -152,8 +152,8 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
                                     key={style}
                                     onClick={() => setConfig({ ...config, hairStyle: style })}
                                     className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${config.hairStyle === style
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                                         }`}
                                 >
                                     {style}
@@ -186,8 +186,8 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
                                     key={type}
                                     onClick={() => setConfig({ ...config, eyeType: type })}
                                     className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${config.eyeType === type
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                                         }`}
                                 >
                                     {type}
@@ -205,8 +205,8 @@ export default function AvatarCreator({ onComplete, onSkip }: AvatarCreatorProps
                                     key={type}
                                     onClick={() => setConfig({ ...config, mouthType: type })}
                                     className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${config.mouthType === type
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                                         }`}
                                 >
                                     {type}
